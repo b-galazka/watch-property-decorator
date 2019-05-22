@@ -1,0 +1,1 @@
+# watch-property-typescript-decorator
