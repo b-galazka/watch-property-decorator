@@ -1,6 +1,7 @@
 # watch-property-decorator
 
-Inspired by [vue-property-decorator](https://github.com/kaorun343/vue-property-decorator#Watch).
+Inspired by [vue-property-decorator](https://github.com/kaorun343/vue-property-decorator#Watch).  
+Should **not** be used on arrow function methods.
 
 ## Angular example usage
 
