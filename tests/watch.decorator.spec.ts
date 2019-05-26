@@ -3,7 +3,6 @@ import { Watch } from '../src';
 class TestObject {
     public fieldImmediate = 'initial value';
     public field = 'initial value';
-    public fieldArrow = 'initial value';
     public fieldMultiple = 'initial value';
 
     @Watch<TestObject>('fieldImmediate')
@@ -20,13 +19,6 @@ class TestObject {
         isInitial: boolean
     ): void { }
 
-    @Watch<TestObject>('fieldArrow')
-    public handleFieldValueChangeArrow = (
-        value: string,
-        prevValue: string,
-        isInitial: boolean
-    ): void => { }
-
     @Watch<TestObject>('fieldMultiple')
     public handleFieldValueChangeMulti1(
         value: string,
@@ -34,7 +26,7 @@ class TestObject {
         isInitial: boolean
     ): void { }
 
-    @Watch<TestObject>('fieldMultiple')
+    @Watch<TestObject>('fieldMultiple', { immediate: false })
     public handleFieldValueChangeMulti2(
         value: string,
         prevValue: string,
@@ -48,7 +40,7 @@ class TestObject {
         isInitial: boolean
     ): void { }
 
-    @Watch<TestObject>('fieldMultiple')
+    @Watch<TestObject>('fieldMultiple', { immediate: false })
     public handleFieldValueChangeMulti4(
         value: string,
         prevValue: string,
@@ -78,21 +70,14 @@ describe('@Watch', () => {
         expect(spy).toHaveBeenCalledWith('new value', 'initial value', false);
     });
 
-    it('should work with arrow function', () => {
-        const testObj = new TestObject();
-        const spy = jest.spyOn(testObj, 'handleFieldValueChangeArrow');
-
-        testObj.fieldArrow = 'new value';
-
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith('new value', 'initial value', false);
-    });
-
     it('should allow to watch single field by multiple methods', () => {
-        const spies = [
+        const immediateHandlersSpies = [
             jest.spyOn(TestObject.prototype, 'handleFieldValueChangeMulti1'),
+            jest.spyOn(TestObject.prototype, 'handleFieldValueChangeMulti3')
+        ];
+
+        const handlersSpies = [
             jest.spyOn(TestObject.prototype, 'handleFieldValueChangeMulti2'),
-            jest.spyOn(TestObject.prototype, 'handleFieldValueChangeMulti3'),
             jest.spyOn(TestObject.prototype, 'handleFieldValueChangeMulti4')
         ];
 
@@ -101,11 +86,17 @@ describe('@Watch', () => {
         testObj.fieldMultiple = 'second value';
         testObj.fieldMultiple = 'third value';
 
-        spies.forEach((spy) => {
+        immediateHandlersSpies.forEach((spy) => {
             expect(spy).toHaveBeenCalledTimes(3);
             expect(spy).toHaveBeenNthCalledWith(1, 'initial value', undefined, true);
             expect(spy).toHaveBeenNthCalledWith(2, 'second value', 'initial value', false);
             expect(spy).toHaveBeenNthCalledWith(3, 'third value', 'second value', false);
+        });
+
+        handlersSpies.forEach((spy) => {
+            expect(spy).toHaveBeenCalledTimes(2);
+            expect(spy).toHaveBeenNthCalledWith(1, 'second value', 'initial value', false);
+            expect(spy).toHaveBeenNthCalledWith(2, 'third value', 'second value', false);
         });
     });
 });

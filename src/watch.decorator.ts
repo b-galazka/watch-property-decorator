@@ -13,7 +13,7 @@ export function Watch<T = any>(propName: keyof T, options: WatchOptions = { imme
                     const isInitialValue = propertyDescriptor.set.call(this, value);
                     const method = <() => any> this[methodName];
 
-                    if (method && (!isInitialValue || options.immediate)) {
+                    if (!isInitialValue || options.immediate) {
                         method.call(this, value, prevValue, isInitialValue);
                     }
 
@@ -24,19 +24,18 @@ export function Watch<T = any>(propName: keyof T, options: WatchOptions = { imme
                     return propertyDescriptor.get.call(this);
                 },
 
-                configurable: true,
+                configurable: true
             });
         }
 
-        Object.defineProperty(target, propName, {
+        return Object.defineProperty(target, propName, {
             set(value: any): boolean {
                 const prevValue = this[valueKey];
                 const isInitialValue = !this.hasOwnProperty(valueKey);
                 const method = <() => any> this[methodName];
                 this[valueKey] = value;
 
-
-                if (method && (!isInitialValue || options.immediate)) {
+                if (!isInitialValue || options.immediate) {
                     method.call(this, value, prevValue, isInitialValue);
                 }
 
