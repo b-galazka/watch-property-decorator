@@ -2,6 +2,9 @@
     "name": "watch-property-decorator",
     "version": "1.0.0",
     "main": "./src/index.ts",
+    "files": [
+      "src"
+    ],
     "scripts": {
         "test": "jest",
         "test:watch": "jest --watch",
